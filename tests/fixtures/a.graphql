@@ -1,0 +1,4 @@
+type A {
+    "name field for A struct"
+    name: String!
+}

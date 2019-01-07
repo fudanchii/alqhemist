@@ -1,0 +1,4 @@
+type C {
+    name: String!
+    address(abbreviate: Boolean! = false): String!
+}
