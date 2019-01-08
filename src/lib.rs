@@ -1,5 +1,4 @@
 extern crate graphql_parser as graphql;
-extern crate lazy_static;
 
 use graphql::schema::Definition;
 

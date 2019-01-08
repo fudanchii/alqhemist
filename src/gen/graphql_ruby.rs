@@ -1,6 +1,7 @@
 use tera::{Context, Tera};
 
 use graphql::schema::{Field, InputValue, ObjectType, Type, TypeDefinition, Value};
+use heck::SnakeCase;
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -76,7 +77,7 @@ fn to_type_fields(
         let mut map = BTreeMap::new();
         let parsed_field = resolve_type(&field.field_type, type_context);
 
-        map.insert("name", field.name.clone());
+        map.insert("name", field.name.clone().to_snake_case());
         map.insert("type", parsed_field.typ);
         map.insert("nullable", parsed_field.nullable.to_string());
         map.insert("description_decl", resolve_description(field));
@@ -94,24 +95,20 @@ fn resolve_type(ftype: &Type, type_context: &mut BTreeMap<String, String>) -> Pa
             result.typ = type_context.get(name).unwrap_or(name).to_string();
             result.nullable = true;
         }
-        Type::ListType(ftyp) => {
-            result.typ = format!("[{}]", resolve_name(&*ftyp, type_context));
+        Type::ListType(inner_type) => {
+            let inner_parsed_field = resolve_type(&*inner_type, type_context);
+            result.typ = format!(
+                "[{}, null: {}]",
+                inner_parsed_field.typ, inner_parsed_field.nullable
+            );
             result.nullable = true;
         }
-        Type::NonNullType(ftyp) => {
-            result.typ = resolve_type(&*ftyp, type_context).typ;
+        Type::NonNullType(inner_type) => {
+            result.typ = resolve_type(&*inner_type, type_context).typ;
             result.nullable = false;
         }
     }
     result
-}
-
-fn resolve_name(ftype: &Type, type_context: &mut BTreeMap<String, String>) -> String {
-    match ftype {
-        Type::NamedType(name) => type_context.get(name).unwrap_or(name).to_string(),
-        Type::ListType(ftyp) => resolve_name(&*ftyp, type_context),
-        Type::NonNullType(ftyp) => resolve_name(&*ftyp, type_context),
-    }
 }
 
 fn resolve_description(field: &Field) -> String {

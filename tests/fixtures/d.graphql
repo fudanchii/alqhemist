@@ -1,0 +1,7 @@
+type D {
+    "Servant class name"
+    servantClass: ServantClass!
+
+    "List of weapon used by this servant"
+    weapons: [String!]!
+}
