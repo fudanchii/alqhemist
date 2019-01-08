@@ -98,8 +98,13 @@ fn resolve_type(ftype: &Type, type_context: &mut BTreeMap<String, String>) -> Pa
         Type::ListType(inner_type) => {
             let inner_parsed_field = resolve_type(&*inner_type, type_context);
             result.typ = format!(
-                "[{}, null: {}]",
-                inner_parsed_field.typ, inner_parsed_field.nullable
+                "[{}{}]",
+                inner_parsed_field.typ,
+                if inner_parsed_field.nullable {
+                    ", null: true".to_string()
+                } else {
+                    "".to_string()
+                }
             );
             result.nullable = true;
         }

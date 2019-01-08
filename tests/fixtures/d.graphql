@@ -4,4 +4,7 @@ type D {
 
     "List of weapon used by this servant"
     weapons: [String!]!
+
+    "List of alter characters"
+    alters: [String]!
 }
