@@ -47,3 +47,12 @@ fn it_renders_type_with_list_field() {
         parse_type_to_ruby("d.graphql", &mut ctx)
     );
 }
+
+#[test]
+fn it_renders_type_with_ext_includes() {
+    let mut ctx = create_context();
+    assert_eq!(
+        read_file("e_type.rb"),
+        parse_type_to_ruby("e.graphql", &mut ctx)
+    );
+}

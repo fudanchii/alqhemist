@@ -1,0 +1,4 @@
+type E @rb_includes {
+    "The name of our host"
+    name: String!
+}

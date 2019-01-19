@@ -1,6 +1,6 @@
 extern crate graphql_parser as graphql;
 
-use graphql::schema::Definition;
+use graphql::schema::{ Definition, TypeDefinition };
 
 use std::collections::BTreeMap;
 use std::io::Read;
@@ -20,11 +20,29 @@ pub fn transmute(schema: &str) -> Result<(), Error> {
         graphql::parse_schema(&contents)?
     };
 
+    // Populate schema_context first
+    for def in &ast.definitions {
+        match def {
+            Definition::TypeDefinition(o) => {
+                match o {
+                    TypeDefinition::Object(obj) => {
+                        schema_context.insert(obj.name.to_string(), format!("{}Type", obj.name));
+                    },
+                    TypeDefinition::Enum(en) => {
+                        schema_context.insert(en.name.to_string(), format!("{}Enum", en.name));
+                    },
+                    _ => {},
+                }
+            },
+            _ => continue,
+        }
+    }
+
     for def in ast.definitions {
         match def {
             Definition::TypeDefinition(mut o) => {
-                println!("{}", mutate_type(&mut o, &mut schema_context))
-            }
+                println!("{}", mutate_type(&mut o, &mut schema_context));
+            },
             _ => println!(""),
         }
     }

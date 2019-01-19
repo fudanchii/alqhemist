@@ -1,6 +1,6 @@
 use tera::{Context, Tera};
 
-use graphql::schema::{Field, InputValue, ObjectType, Type, TypeDefinition, Value};
+use graphql::schema::{Field, ObjectType, Type, TypeDefinition, Value};
 use heck::SnakeCase;
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -10,10 +10,10 @@ use std::collections::BTreeMap;
 static OBJECT_TEMPLATE: &str = r#"# DO NOT EDIT! THIS FILE IS AUTO-GENERATED FROM A GRAPHQL SCHEMA
 module Types
   class {{object_typename}} < Types::BaseObject
+{% if rb_includes %}    include Fields::{{objectname}}{% endif %}
 {% if description %}    description <<-DESC
     {{description}}
     DESC{% endif %}
-{% if rb_includes %}    include {{objectname}}Methods{% endif %}
 {% if implements_interfaces %}{% for interface in implements_interfaces %}
     implements {{interface}}
 {% endfor %}{% endif %}
